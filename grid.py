@@ -2,7 +2,7 @@ import pygame
 import sys
 
 
-CELLSIZE = 40 
+CELLSIZE = 10 
 SCREENWIDTH = 640
 SCREENHEIGHT = 480
 assert SCREENWIDTH % CELLSIZE == 0, "dimensions are off"
@@ -20,9 +20,10 @@ def main():
 
     while running == True:
         DISPLAYSURF.fill((0, 0, 0))
-
+        
         drawGrid()    
         getInput(player)
+        updatePlayer(player)
         drawPlayer(player)
         pygame.display.update()
 
@@ -41,19 +42,43 @@ def getInput(player):
             pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-            player.y += 1
+            player.moving_down = 1
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-            player.y -= 1
+            player.moving_up = 1
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-            player.x += 1
+            player.moving_right = 1
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-            player.x -= 1
+            player.moving_left = 1
+
+        if event.type == pygame.KEYUP and event.key == pygame.K_DOWN:
+            player.moving_down = 0
+        if event.type == pygame.KEYUP and event.key == pygame.K_UP:
+            player.moving_up = 0
+        if event.type == pygame.KEYUP and event.key == pygame.K_RIGHT:
+            player.moving_right = 0
+        if event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
+            player.moving_left = 0
+
+
+
+def updatePlayer(player):
+    if player.moving_down:
+        player.y += 1
+    if player.moving_up:
+        player.y -= 1
+    if player.moving_right:
+        player.x += 1
+    if player.moving_left:
+        player.x -= 1
         
 class Player():
     def __init__(self):
         self.x = 0 
         self.y = 0
- 
+        self.moving_down = 0
+        self.moving_up = 0
+        self.moving_left = 0
+        self.moving_right = 0
 
 
 if __name__ == '__main__':
