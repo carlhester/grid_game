@@ -2,23 +2,27 @@ import pygame
 import sys
 import random
 
-CELLSIZE = 40 
-SCREENWIDTH = 640
-SCREENHEIGHT = 480
+FPS = 60 
+CELLSIZE = 20 
+SCREENWIDTH = 800
+SCREENHEIGHT = 600
 assert SCREENWIDTH % CELLSIZE == 0, "dimensions are off"
 assert SCREENHEIGHT % CELLSIZE == 0, "dimensions are off"
 
 
 
 def main():
-    global DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE
+    global FPSCLOCK, DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE
     pygame.init()
+
+    FPSCLOCK = pygame.time.Clock()
     
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     player = Player() 
     asteroidGroup = []
-    asteroid = Asteroid()
-    asteroidGroup.append(asteroid)
+    while len(asteroidGroup) < 5:
+        asteroid = Asteroid()
+        asteroidGroup.append(asteroid)
 
     running = True
 
@@ -33,6 +37,7 @@ def main():
         updatePlayer(player, SCREENWIDTH, SCREENHEIGHT, CELLSIZE)
         drawPlayer(player)
         pygame.display.update()
+        FPSCLOCK.tick(FPS)
 
 
 
@@ -93,7 +98,6 @@ class Asteroid():
     def __init__(self):
         self.x = random.randint(0, (SCREENWIDTH / CELLSIZE) - 1)
         self.y = random.randint(0, (SCREENHEIGHT / CELLSIZE) - 1)
-        print self.x, self.y
 
     def update(self):
         pass
