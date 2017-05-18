@@ -1,6 +1,6 @@
 import pygame
 import sys
-
+import random
 
 CELLSIZE = 40 
 SCREENWIDTH = 640
@@ -11,17 +11,24 @@ assert SCREENHEIGHT % CELLSIZE == 0, "dimensions are off"
 
 
 def main():
-    global DISPLAYSURF
+    global DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE
     pygame.init()
     
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     player = Player() 
+    asteroidGroup = []
+    asteroid = Asteroid()
+    asteroidGroup.append(asteroid)
+
     running = True
 
     while running == True:
         DISPLAYSURF.fill((0, 0, 0))
         
         drawGrid()    
+        for asteroid in asteroidGroup:
+            asteroid.update()
+            asteroid.draw()
         getInput(player)
         updatePlayer(player, SCREENWIDTH, SCREENHEIGHT, CELLSIZE)
         drawPlayer(player)
@@ -65,7 +72,6 @@ def getInput(player):
 
 def updatePlayer(player, SCREENWIDTH, SCREENHEIGHT, CELLSIZE):
     if player.moving_down and player.y < (SCREENHEIGHT / CELLSIZE) - 1:
-        print player.y, SCREENHEIGHT / CELLSIZE
         player.y += 1
     if player.moving_up and player.y > 0:
         player.y -= 1
@@ -76,12 +82,24 @@ def updatePlayer(player, SCREENWIDTH, SCREENHEIGHT, CELLSIZE):
         
 class Player():
     def __init__(self):
-        self.x = 0 
+        self.x = 0
         self.y = 0
         self.moving_down = 0
         self.moving_up = 0
         self.moving_left = 0
         self.moving_right = 0
+
+class Asteroid():
+    def __init__(self):
+        self.x = random.randint(0, (SCREENWIDTH / CELLSIZE) - 1)
+        self.y = random.randint(0, (SCREENHEIGHT / CELLSIZE) - 1)
+        print self.x, self.y
+
+    def update(self):
+        pass
+
+    def draw(self):
+        pygame.draw.rect(DISPLAYSURF, (128, 0, 255), (self.x * CELLSIZE, self.y * CELLSIZE, CELLSIZE, CELLSIZE))
 
 
 if __name__ == '__main__':
