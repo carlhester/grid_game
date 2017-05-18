@@ -2,7 +2,7 @@ import pygame
 import sys
 
 
-CELLSIZE = 10 
+CELLSIZE = 40 
 SCREENWIDTH = 640
 SCREENHEIGHT = 480
 assert SCREENWIDTH % CELLSIZE == 0, "dimensions are off"
@@ -23,9 +23,11 @@ def main():
         
         drawGrid()    
         getInput(player)
-        updatePlayer(player)
+        updatePlayer(player, SCREENWIDTH, SCREENHEIGHT, CELLSIZE)
         drawPlayer(player)
         pygame.display.update()
+
+
 
 def drawGrid():
     for x in range(0, SCREENWIDTH, CELLSIZE):
@@ -41,13 +43,13 @@ def getInput(player):
         if event.type == pygame.KEYUP and event.key == pygame.K_q:
             pygame.quit()
             sys.exit()
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
             player.moving_down = 1
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
             player.moving_up = 1
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
             player.moving_right = 1
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
             player.moving_left = 1
 
         if event.type == pygame.KEYUP and event.key == pygame.K_DOWN:
@@ -61,14 +63,15 @@ def getInput(player):
 
 
 
-def updatePlayer(player):
-    if player.moving_down:
+def updatePlayer(player, SCREENWIDTH, SCREENHEIGHT, CELLSIZE):
+    if player.moving_down and player.y < (SCREENHEIGHT / CELLSIZE) - 1:
+        print player.y, SCREENHEIGHT / CELLSIZE
         player.y += 1
-    if player.moving_up:
+    if player.moving_up and player.y > 0:
         player.y -= 1
-    if player.moving_right:
+    if player.moving_right and player.x < (SCREENWIDTH / CELLSIZE) - 1:
         player.x += 1
-    if player.moving_left:
+    if player.moving_left and player.x > 0:
         player.x -= 1
         
 class Player():
