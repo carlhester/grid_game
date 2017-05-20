@@ -2,7 +2,7 @@ import pygame
 import sys
 import random
 
-FPS = 30 
+FPS = 10 
 CELLSIZE = 50 
 SCREENWIDTH = 800
 SCREENHEIGHT = 600
@@ -28,13 +28,14 @@ def main():
     while running == True:
         DISPLAYSURF.fill((0, 0, 0))
         
-        drawGrid()    
+#        drawGrid()    
         #for asteroid in asteroidGroup:
         #    asteroid.update()
         #    asteroid.draw()
         getInput(player)
         player.update()
         player.draw()
+        drawGrid()    
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -62,7 +63,7 @@ def getInput(player):
             player.facing = 0 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
             player.moving_left = 1
-            player.facing = 1 
+            player.facing = 2 
 
         if event.type == pygame.KEYUP and event.key == pygame.K_DOWN:
             player.moving_down = 0
@@ -75,15 +76,31 @@ def getInput(player):
 
 class Player():
     def __init__(self):
-        self.player_surf = pygame.Surface((CELLSIZE, CELLSIZE), pygame.SRCALPHA).convert()
-        self.player_rect = self.player_surf.get_rect()
-        self.player_img = pygame.image.load('hero.png')
-        self.player_img = pygame.transform.scale(self.player_img, (CELLSIZE, CELLSIZE))
-        self.player_rect = self.player_img.get_rect()
 
-        self.player_img_back = pygame.image.load('hero_back.png')
-        self.player_img_back = pygame.transform.scale(self.player_img_back, (CELLSIZE, CELLSIZE))
-        self.player_rect = self.player_img_back.get_rect()
+        self.spritesheet = pygame.image.load('hero_spritesheet.png')     
+    
+        #self.player_surf = pygame.Surface((CELLSIZE, CELLSIZE), pygame.SRCALPHA).convert()
+        #self.player_img = pygame.image.load('hero.png')
+        #self.player_img = pygame.transform.scale(self.player_img, (CELLSIZE, CELLSIZE))
+        #self.player_img_back = pygame.image.load('hero_back.png')
+        #self.player_img_back = pygame.transform.scale(self.player_img_back, (CELLSIZE, CELLSIZE))
+
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (-32, 0))
+        self.player_img = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (-32, -96))
+        self.player_img_back = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (-32, -64))
+        self.player_img_right = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (-32, -32))
+        self.player_img_left = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+
 
         self.x = 0
         self.y = 0
@@ -105,10 +122,13 @@ class Player():
             self.x -= 1
 
     def draw(self):
-        #pygame.draw.rect(DISPLAYSURF, (255, 0, 255), (self.x * CELLSIZE, self.y * CELLSIZE, CELLSIZE, CELLSIZE))
+        if self.facing == 0:
+            DISPLAYSURF.blit(self.player_img_right, (self.x * CELLSIZE,self.y * CELLSIZE))
+        if self.facing == 2:
+            DISPLAYSURF.blit(self.player_img_left, (self.x * CELLSIZE,self.y * CELLSIZE))
         if self.facing == 3:
             DISPLAYSURF.blit(self.player_img_back, (self.x * CELLSIZE,self.y * CELLSIZE))
-        else:
+        if self.facing == 1:
             DISPLAYSURF.blit(self.player_img, (self.x * CELLSIZE,self.y * CELLSIZE))
         
 
