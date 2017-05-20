@@ -3,7 +3,7 @@ import sys
 import random
 
 FPS = 60 
-CELLSIZE = 20 
+CELLSIZE = 50 
 SCREENWIDTH = 800
 SCREENHEIGHT = 600
 assert SCREENWIDTH % CELLSIZE == 0, "dimensions are off"
@@ -19,10 +19,10 @@ def main():
     
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     player = Player() 
-    asteroidGroup = []
-    while len(asteroidGroup) < 5:
-        asteroid = Asteroid()
-        asteroidGroup.append(asteroid)
+#    asteroidGroup = []
+#    while len(asteroidGroup) < 5:
+#        asteroid = Asteroid()
+#        asteroidGroup.append(asteroid)
 
     running = True
 
@@ -30,12 +30,12 @@ def main():
         DISPLAYSURF.fill((0, 0, 0))
         
         drawGrid()    
-        for asteroid in asteroidGroup:
-            asteroid.update()
-            asteroid.draw()
+        #for asteroid in asteroidGroup:
+        #    asteroid.update()
+        #    asteroid.draw()
         getInput(player)
-        updatePlayer(player, SCREENWIDTH, SCREENHEIGHT, CELLSIZE)
-        drawPlayer(player)
+        player.update()
+        player.draw()
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -46,9 +46,6 @@ def drawGrid():
         pygame.draw.line(DISPLAYSURF, (100, 100, 100), (x, 0), (x, SCREENHEIGHT))
     for y in range(0, SCREENHEIGHT, CELLSIZE):
         pygame.draw.line(DISPLAYSURF, (100, 100, 100), (0, y), (SCREENWIDTH, y))
-
-def drawPlayer(player):
-    pygame.draw.rect(DISPLAYSURF, (255, 0, 255), (player.x * CELLSIZE, player.y * CELLSIZE, CELLSIZE, CELLSIZE))
 
 def getInput(player):
     for event in pygame.event.get():
@@ -73,26 +70,36 @@ def getInput(player):
         if event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
             player.moving_left = 0
 
-
-
-def updatePlayer(player, SCREENWIDTH, SCREENHEIGHT, CELLSIZE):
-    if player.moving_down and player.y < (SCREENHEIGHT / CELLSIZE) - 1:
-        player.y += 1
-    if player.moving_up and player.y > 0:
-        player.y -= 1
-    if player.moving_right and player.x < (SCREENWIDTH / CELLSIZE) - 1:
-        player.x += 1
-    if player.moving_left and player.x > 0:
-        player.x -= 1
-        
 class Player():
     def __init__(self):
+        self.player_surf = pygame.Surface((CELLSIZE, CELLSIZE), pygame.SRCALPHA).convert()
+        self.player_rect = self.player_surf.get_rect()
+        self.player_img = pygame.image.load('hero.png')
+        self.player_img = pygame.transform.scale(self.player_img, (CELLSIZE, CELLSIZE))
+        self.player_surf.blit(self.player_img, self.player_rect)
+
         self.x = 0
         self.y = 0
         self.moving_down = 0
         self.moving_up = 0
         self.moving_left = 0
         self.moving_right = 0
+
+
+    def update(self):
+        if self.moving_down and self.y < (SCREENHEIGHT / CELLSIZE) - 1:
+            self.y += 1
+        if self.moving_up and self.y > 0:
+            self.y -= 1
+        if self.moving_right and self.x < (SCREENWIDTH / CELLSIZE) - 1:
+            self.x += 1
+        if self.moving_left and self.x > 0:
+            self.x -= 1
+
+    def draw(self):
+        #pygame.draw.rect(DISPLAYSURF, (255, 0, 255), (self.x * CELLSIZE, self.y * CELLSIZE, CELLSIZE, CELLSIZE))
+        DISPLAYSURF.blit(self.player_img, (self.x * CELLSIZE,self.y * CELLSIZE))
+        
 
 class Asteroid():
     def __init__(self):
