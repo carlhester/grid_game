@@ -18,24 +18,22 @@ def main():
     
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     player = Player() 
-#    asteroidGroup = []
-#    while len(asteroidGroup) < 5:
-#        asteroid = Asteroid()
-#        asteroidGroup.append(asteroid)
+   
+    wallGroup = [] 
+    wall = Wall(0,0)
+    wallGroup.append(wall)
+    wall = Wall(0,1)
+    wallGroup.append(wall)
 
     running = True
-
     while running == True:
         DISPLAYSURF.fill((0, 0, 0))
-        
-#        drawGrid()    
-        #for asteroid in asteroidGroup:
-        #    asteroid.update()
-        #    asteroid.draw()
         getInput(player)
         player.update()
         player.draw()
         drawGrid()    
+        for wall in wallGroup:
+            wall.draw()
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -46,6 +44,11 @@ def drawGrid():
         pygame.draw.line(DISPLAYSURF, (100, 100, 100), (x, 0), (x, SCREENHEIGHT))
     for y in range(0, SCREENHEIGHT, CELLSIZE):
         pygame.draw.line(DISPLAYSURF, (100, 100, 100), (0, y), (SCREENWIDTH, y))
+
+def draw_room(wallGroup):
+    for cell in wallGroup:
+        cell.draw(cell)
+    
 
 def getInput(player):
     for event in pygame.event.get():
@@ -130,7 +133,21 @@ class Player():
             DISPLAYSURF.blit(self.player_img_back, (self.x * CELLSIZE,self.y * CELLSIZE))
         if self.facing == 1:
             DISPLAYSURF.blit(self.player_img, (self.x * CELLSIZE,self.y * CELLSIZE))
+      
+class Wall():
+    def __init__(self, x, y):
+        self.x = x 
+        self.y = y  
+        self.wall_img = pygame.image.load('wall.png')
+        self.wall_img = pygame.transform.scale(self.wall_img, ((CELLSIZE, CELLSIZE)))
+        DISPLAYSURF.blit(self.wall_img, (self.x * CELLSIZE, self.y * CELLSIZE))
+ 
+    def update(self):
+        pass
         
+    def draw(self):
+        DISPLAYSURF.blit(self.wall_img, (self.x * CELLSIZE, self.y * CELLSIZE))
+         
 
 class Asteroid():
     def __init__(self):
