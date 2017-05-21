@@ -19,7 +19,6 @@ def main():
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     player = Player() 
 
-
     wallGroup = [] 
     bgGroup = []
     create_level(levels.levels[0][0], bgGroup, wallGroup)
@@ -92,22 +91,75 @@ class Player():
     def __init__(self):
 
         self.spritesheet = pygame.image.load('hero_spritesheet.png')     
-    
+   
+        self.player_img_list = [] 
+        self.player_img_back_list = [] 
+        self.player_img_right_list = [] 
+        self.player_img_left_list = [] 
+
+        #walking down
         self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
         self.player_surf.blit(self.spritesheet, (-32, 0))
         self.player_img = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_list.append(self.player_img)
+ 
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (0, 0))
+        self.player_img = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_list.append(self.player_img)
         
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (-64, 0))
+        self.player_img = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_list.append(self.player_img)
+        
+        #walking up
         self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
         self.player_surf.blit(self.spritesheet, (-32, -96))
         self.player_img_back = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_back_list.append(self.player_img_back)
         
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (0, -96))
+        self.player_img_back = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_back_list.append(self.player_img_back)
+        
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (-64, -96))
+        self.player_img_back = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_back_list.append(self.player_img_back)
+        
+        #walking right 
         self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
         self.player_surf.blit(self.spritesheet, (-32, -64))
         self.player_img_right = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
-        
+        self.player_img_right_list.append(self.player_img_right)
+       
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (0, -64))
+        self.player_img_right = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_right_list.append(self.player_img_right)
+       
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (-64, -64))
+        self.player_img_right = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_right_list.append(self.player_img_right)
+       
+        #walking left 
         self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
         self.player_surf.blit(self.spritesheet, (-32, -32))
         self.player_img_left = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_left_list.append(self.player_img_left)
+
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (0, -32))
+        self.player_img_left = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_left_list.append(self.player_img_left)
+
+        self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA).convert()
+        self.player_surf.blit(self.spritesheet, (-64, -32))
+        self.player_img_left = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+        self.player_img_left_list.append(self.player_img_left)
 
 
         self.x = 5
@@ -117,6 +169,7 @@ class Player():
         self.moving_left = 0
         self.moving_right = 0
         self.facing = 0 
+        self.anicount = 0
 
 
     def update(self, wallGroup):
@@ -124,28 +177,34 @@ class Player():
         current_y = self.y
         if self.moving_down and self.y < (SCREENHEIGHT / CELLSIZE) - 1:
             self.y += 1
+            self.anicount += 1
         if self.moving_up and self.y > 0:
             self.y -= 1
+            self.anicount += 1
         if self.moving_right and self.x < (SCREENWIDTH / CELLSIZE) - 1:
             self.x += 1
+            self.anicount += 1
         if self.moving_left and self.x > 0:
             self.x -= 1
+            self.anicount += 1
         if (self.x, self.y) in wallGroup:
             self.x = current_x
             self.y = current_y 
         pygame.time.wait(100)
+        if self.anicount >= 3:
+            self.anicount = 0
+            
 
 
     def draw(self):
         if self.facing == 0:
-            DISPLAYSURF.blit(self.player_img_right, (self.x * CELLSIZE,self.y * CELLSIZE))
-        if self.facing == 2:
-            DISPLAYSURF.blit(self.player_img_left, (self.x * CELLSIZE,self.y * CELLSIZE))
-        if self.facing == 3:
-            DISPLAYSURF.blit(self.player_img_back, (self.x * CELLSIZE,self.y * CELLSIZE))
+            DISPLAYSURF.blit(self.player_img_right_list[self.anicount], (self.x * CELLSIZE,self.y * CELLSIZE))
         if self.facing == 1:
-            DISPLAYSURF.blit(self.player_img, (self.x * CELLSIZE,self.y * CELLSIZE))
-     
+            DISPLAYSURF.blit(self.player_img_list[self.anicount], (self.x * CELLSIZE,self.y * CELLSIZE))
+        if self.facing == 2:
+            DISPLAYSURF.blit(self.player_img_left_list[self.anicount], (self.x * CELLSIZE,self.y * CELLSIZE))
+        if self.facing == 3:
+            DISPLAYSURF.blit(self.player_img_back_list[self.anicount], (self.x * CELLSIZE,self.y * CELLSIZE))
 
  
 class Wall():

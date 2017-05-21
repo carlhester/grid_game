@@ -11,6 +11,13 @@ room1 = ["#######...######",
          "#..............#",
          "######..########"]
 
-level1 = [room1]
+level1 = []
+level1.append(room1)
+
+
+
+
+
+
+
 levels = [level1]
-print levels[0][0] 
