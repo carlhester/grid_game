@@ -11,35 +11,41 @@ assert SCREENWIDTH % CELLSIZE == 0, "dimensions are off"
 assert SCREENHEIGHT % CELLSIZE == 0, "dimensions are off"
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE
+    global FPSCLOCK, DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE, mapX, mapY
     pygame.init()
 
     FPSCLOCK = pygame.time.Clock()
     
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
-    player = Player() 
+    player = Player(5,4) 
 
+    mapX = 0
+    mapY = 0 
     wallGroup = [] 
     bgGroup = []
-    create_level(levels.levels[0][0], bgGroup, wallGroup)
-    running = True
+    connGroup = []
+    create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, player, connGroup)
     
+    running = True
     while running == True:
+        pygame.display.set_caption(str(player.x) + ":" + str(player.y) + "\t" + str(mapX) + ":" + str(mapY)) 
         DISPLAYSURF.fill((0, 0, 0))
         getInput(player)
-        player.update(wallGroup)
+        player.update(wallGroup, connGroup, bgGroup)
         draw_level(bgGroup)
         player.draw()
         #drawGrid()    
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-def create_level(level, bgGroup, wallGroup):
+def create_level(level, bgGroup, wallGroup, player, connGroup):
     for y in range(0, len(level)):
         for x in range(0, len(level[y])):
             bgGroup.append((x, y, level[y][x]))
             if level[y][x] == '#':
                 wallGroup.append((x, y))
+            if level[y][x] == 'X':
+                connGroup.append((x, y))
 
 def draw_level(bgGroup):
     grass_img = pygame.image.load('grass.png')
@@ -50,7 +56,9 @@ def draw_level(bgGroup):
     for x, y, bg_type in bgGroup:
         if bg_type == '#':
             DISPLAYSURF.blit(wall_img, (x * CELLSIZE, y * CELLSIZE))
-        if bg_type == '.':
+        if bg_type in ('.', 'X'):
+            DISPLAYSURF.blit(grass_img, (x * CELLSIZE, y * CELLSIZE))
+        if bg_type == 'L':
             DISPLAYSURF.blit(grass_img, (x * CELLSIZE, y * CELLSIZE))
 
 
@@ -87,8 +95,11 @@ def getInput(player):
         if event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
             player.moving_left = 0
 
+        print player.x, player.y
+        
+
 class Player():
-    def __init__(self):
+    def __init__(self, x, y):
 
         self.spritesheet = pygame.image.load('hero_spritesheet.png')     
    
@@ -162,8 +173,8 @@ class Player():
         self.player_img_left_list.append(self.player_img_left)
 
 
-        self.x = 5
-        self.y = 4
+        self.x = x
+        self.y = y
         self.moving_down = 0
         self.moving_up = 0
         self.moving_left = 0
@@ -172,7 +183,8 @@ class Player():
         self.anicount = 0
 
 
-    def update(self, wallGroup):
+    def update(self, wallGroup, connGroup, bgGroup):
+        global mapX, mapY
         current_x = self.x
         current_y = self.y
         if self.moving_down and self.y < (SCREENHEIGHT / CELLSIZE) - 1:
@@ -190,7 +202,35 @@ class Player():
         if (self.x, self.y) in wallGroup:
             self.x = current_x
             self.y = current_y 
-        pygame.time.wait(100)
+        if (self.x, self.y) in connGroup:
+            if self.y >= 11:
+                mapY += 1
+                del bgGroup[:]
+                del wallGroup[:]
+                del connGroup[:]
+                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
+                self.y = 0
+            elif self.x >= 15:
+                mapX += 1
+                del bgGroup[:]
+                del wallGroup[:]
+                del connGroup[:]
+                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
+                self.x = 0
+            elif self.y == 0:
+                mapY -= 1
+                del bgGroup[:]
+                del wallGroup[:]
+                del connGroup[:]
+                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
+                self.y = 11
+            elif self.x == 0:
+                mapX -= 1
+                del bgGroup[:]
+                del wallGroup[:]
+                del connGroup[:]
+                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
+                self.x = 15
         if self.anicount >= 3:
             self.anicount = 0
             
@@ -207,44 +247,6 @@ class Player():
             DISPLAYSURF.blit(self.player_img_back_list[self.anicount], (self.x * CELLSIZE,self.y * CELLSIZE))
 
  
-class Wall():
-    def __init__(self, x, y):
-        self.x = x 
-        self.y = y
-        self.draw_image = False
-
-        self.wall_img = pygame.image.load('wall.png')
-        self.wall_img = pygame.transform.scale(self.wall_img, ((CELLSIZE, CELLSIZE)))
- 
-        self.grass_img = pygame.image.load('grass.png')
-        self.grass_img = pygame.transform.scale(self.wall_img, ((CELLSIZE, CELLSIZE)))
-
-
-    def update(self):
-        pass
-        
-    def draw(self, bg_type, x, y):
-        if bg_type == '#':
-            self.draw_img = self.wall_img
-        elif bg_type == '.':
-            self.draw_image = self.grass_img
-        else:
-            self.draw_image = self.grass_img
-        
-        DISPLAYSURF.blit(self.draw_img, (self.x * CELLSIZE, self.y * CELLSIZE))
-         
-
-class Asteroid():
-    def __init__(self):
-        self.x = random.randint(0, (SCREENWIDTH / CELLSIZE) - 1)
-        self.y = random.randint(0, (SCREENHEIGHT / CELLSIZE) - 1)
-
-    def update(self):
-        pass
-
-    def draw(self):
-        pygame.draw.rect(DISPLAYSURF, (128, 0, 255), (self.x * CELLSIZE, self.y * CELLSIZE, CELLSIZE, CELLSIZE))
-
 
 if __name__ == '__main__':
     main()
