@@ -187,13 +187,13 @@ class Player():
         global mapX, mapY
         current_x = self.x
         current_y = self.y
-        if self.moving_down and self.y < (SCREENHEIGHT / CELLSIZE) - 1:
+        if self.moving_down and self.y < (SCREENHEIGHT / CELLSIZE):
             self.y += 1
             self.anicount += 1
         if self.moving_up and self.y > 0:
             self.y -= 1
             self.anicount += 1
-        if self.moving_right and self.x < (SCREENWIDTH / CELLSIZE) - 1:
+        if self.moving_right and self.x < (SCREENWIDTH / CELLSIZE):
             self.x += 1
             self.anicount += 1
         if self.moving_left and self.x > 0:
@@ -203,28 +203,28 @@ class Player():
             self.x = current_x
             self.y = current_y 
         if (self.x, self.y) in connGroup:
-            if self.y >= 11:
+            if self.y == 11 and self.moving_down:
                 mapY += 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
                 create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
                 self.y = 0
-            elif self.x >= 15:
+            elif self.x == 15 and self.moving_right:
                 mapX += 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
                 create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
                 self.x = 0
-            elif self.y == 0:
+            elif self.y == 0 and self.moving_up:
                 mapY -= 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
                 create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
                 self.y = 11
-            elif self.x == 0:
+            elif self.x == 0 and self.moving_left:
                 mapX -= 1
                 del bgGroup[:]
                 del wallGroup[:]
@@ -233,7 +233,7 @@ class Player():
                 self.x = 15
         if self.anicount >= 3:
             self.anicount = 0
-            
+        self.moving_down = self.moving_up = self.moving_left = self.moving_right = 0     
 
 
     def draw(self):
