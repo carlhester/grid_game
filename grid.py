@@ -3,7 +3,7 @@ import sys
 import random
 import levels
 
-FPS = 30 
+FPS = 60 
 CELLSIZE = 50 
 SCREENWIDTH = 800
 SCREENHEIGHT = 600
@@ -12,12 +12,13 @@ assert SCREENWIDTH % CELLSIZE == 0, "dimensions are off"
 assert SCREENHEIGHT % CELLSIZE == 0, "dimensions are off"
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE, mapX, mapY
+    global GAMERUNNING, FPSCLOCK, DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE, mapX, mapYI
     pygame.init()
-
+    
     FPSCLOCK = pygame.time.Clock()
     
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+    DISPLAYSURF.set_alpha(0)
     
     grass_img = pygame.image.load('grass.png')
     grass_img = pygame.transform.scale(grass_img, ((CELLSIZE, CELLSIZE)))
@@ -33,18 +34,39 @@ def main():
     connGroup = []
     create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, player, connGroup)
     
-    running = True
-    while running == True:
+    GAMERUNNING = True
+    while GAMERUNNING == True:
         pygame.display.set_caption(str(player.x) + ":" + str(player.y) + "\t" + str(mapX) + ":" + str(mapY)) 
-        DISPLAYSURF.fill((0, 0, 0))
+        #DISPLAYSURF.fill((0, 0, 0))
         getInput(player)
         player.update(wallGroup, connGroup, bgGroup)
         draw_level(bgGroup, grass_img, wall_img)
         player.draw()
-        #drawGrid()    
+        drawGrid()    
+        drawHearts(player)
+        if player.messages != "":
+            drawMessages(player.messages)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
+
+def drawHearts(player):
+    heart_img = pygame.image.load('heart.png')
+    heart_img = pygame.transform.scale(heart_img, (20, 20))
+    spacing = 10
+    for heart in range(1, player.hitpoints + 1):
+        DISPLAYSURF.blit(heart_img, (spacing, 10))
+        spacing += 30
+
+def drawMessages(message):
+    width = int(SCREENWIDTH * .8)
+    height = int(SCREENHEIGHT / 5)
+    left = int(SCREENWIDTH - width) / 2
+    top = int((SCREENHEIGHT / 5))
+
+    pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (left, top, width, height))
+
+    
 def create_level(level, bgGroup, wallGroup, player, connGroup):
     for y in range(0, len(level)):
         for x in range(0, len(level[y])):
@@ -70,33 +92,44 @@ def drawGrid():
 
 def getInput(player):
     for event in pygame.event.get():
-        if event.type == pygame.KEYUP and event.key == pygame.K_q:
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-            player.moving_down = 1
-            player.facing = 1 
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-            player.moving_up = 1
-            player.facing = 3 
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-            player.moving_right = 1
-            player.facing = 0 
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-            player.moving_left = 1
-            player.facing = 2 
+        if player.messages != "":
+            if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                player.messages = ""
+        else: 
+            if event.type == pygame.KEYUP and event.key == pygame.K_z:
+                player.messages = "error message"
+             
+             
+            if event.type == pygame.KEYUP and event.key == pygame.K_q:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                player.moving_down = 1
+                player.facing = 1 
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                player.moving_up = 1
+                player.facing = 3 
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                player.moving_right = 1
+                player.facing = 0 
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                player.moving_left = 1
+                player.facing = 2 
 
-        if event.type == pygame.KEYUP and event.key == pygame.K_DOWN:
-            player.moving_down = 0
-        if event.type == pygame.KEYUP and event.key == pygame.K_UP:
-            player.moving_up = 0
-        if event.type == pygame.KEYUP and event.key == pygame.K_RIGHT:
-            player.moving_right = 0
-        if event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
-            player.moving_left = 0
+            if event.type == pygame.KEYUP and event.key == pygame.K_o:
+                player.hitpoints -= 1
 
-        print player.x, player.y
-        
+            if event.type == pygame.KEYUP and event.key == pygame.K_p:
+                player.hitpoints += 1
+
+            if event.type == pygame.KEYUP and event.key == pygame.K_DOWN:
+                player.moving_down = 0
+            if event.type == pygame.KEYUP and event.key == pygame.K_UP:
+                player.moving_up = 0
+            if event.type == pygame.KEYUP and event.key == pygame.K_RIGHT:
+                player.moving_right = 0
+            if event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
+                player.moving_left = 0
 
 class Player():
     def __init__(self, x, y):
@@ -175,16 +208,21 @@ class Player():
 
         self.x = x
         self.y = y
+        self.hitpoints = 1
         self.moving_down = 0
         self.moving_up = 0
         self.moving_left = 0
         self.moving_right = 0
         self.facing = 0 
         self.anicount = 0
+        self.messages = ""
 
 
     def update(self, wallGroup, connGroup, bgGroup):
-        global mapX, mapY
+        global mapX, mapY, GAMERUNNING
+        #if self.hitpoints <= 0:
+        #    self.messages = "ok"
+            
         current_x = self.x
         current_y = self.y
         if self.moving_down and self.y < (SCREENHEIGHT / CELLSIZE):
