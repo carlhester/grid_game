@@ -12,7 +12,7 @@ assert SCREENWIDTH % CELLSIZE == 0, "dimensions are off"
 assert SCREENHEIGHT % CELLSIZE == 0, "dimensions are off"
 
 def main():
-    global GAMERUNNING, FPSCLOCK, DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE, mapX, mapYI
+    global GAMERUNNING, FPSCLOCK, DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE, mapX, mapY
     pygame.init()
     
     FPSCLOCK = pygame.time.Clock()
@@ -24,6 +24,10 @@ def main():
     grass_img = pygame.transform.scale(grass_img, ((CELLSIZE, CELLSIZE)))
     wall_img = pygame.image.load('wall.png')
     wall_img = pygame.transform.scale(wall_img, ((CELLSIZE, CELLSIZE)))
+
+    bg_images = {}
+    bg_images = {'grass' : grass_img, 'wall' : wall_img}
+
     
     player = Player(5,4) 
 
@@ -40,9 +44,9 @@ def main():
         #DISPLAYSURF.fill((0, 0, 0))
         getInput(player)
         player.update(wallGroup, connGroup, bgGroup)
-        draw_level(bgGroup, grass_img, wall_img)
+        draw_level(bgGroup, bg_images)
         player.draw()
-        drawGrid()    
+        #drawGrid()    
         drawHearts(player)
         if player.messages != "":
             drawMessages(player.messages)
@@ -76,12 +80,12 @@ def create_level(level, bgGroup, wallGroup, player, connGroup):
             if level[y][x] == 'X':
                 connGroup.append((x, y))
 
-def draw_level(bgGroup, grass_img, wall_img):
+def draw_level(bgGroup, bg_images):
     for x, y, bg_type in bgGroup:
         if bg_type == '#':
-            DISPLAYSURF.blit(wall_img, (x * CELLSIZE, y * CELLSIZE))
+            DISPLAYSURF.blit(bg_images['wall'], (x * CELLSIZE, y * CELLSIZE))
         else:
-            DISPLAYSURF.blit(grass_img, (x * CELLSIZE, y * CELLSIZE))
+            DISPLAYSURF.blit(bg_images['grass'], (x * CELLSIZE, y * CELLSIZE))
 
 
 def drawGrid():
