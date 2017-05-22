@@ -7,6 +7,7 @@ FPS = 30
 CELLSIZE = 50 
 SCREENWIDTH = 800
 SCREENHEIGHT = 600
+
 assert SCREENWIDTH % CELLSIZE == 0, "dimensions are off"
 assert SCREENHEIGHT % CELLSIZE == 0, "dimensions are off"
 
@@ -17,6 +18,12 @@ def main():
     FPSCLOCK = pygame.time.Clock()
     
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+    
+    grass_img = pygame.image.load('grass.png')
+    grass_img = pygame.transform.scale(grass_img, ((CELLSIZE, CELLSIZE)))
+    wall_img = pygame.image.load('wall.png')
+    wall_img = pygame.transform.scale(wall_img, ((CELLSIZE, CELLSIZE)))
+    
     player = Player(5,4) 
 
     mapX = 0
@@ -32,7 +39,7 @@ def main():
         DISPLAYSURF.fill((0, 0, 0))
         getInput(player)
         player.update(wallGroup, connGroup, bgGroup)
-        draw_level(bgGroup)
+        draw_level(bgGroup, grass_img, wall_img)
         player.draw()
         #drawGrid()    
         pygame.display.update()
@@ -47,18 +54,11 @@ def create_level(level, bgGroup, wallGroup, player, connGroup):
             if level[y][x] == 'X':
                 connGroup.append((x, y))
 
-def draw_level(bgGroup):
-    grass_img = pygame.image.load('grass.png')
-    grass_img = pygame.transform.scale(grass_img, ((CELLSIZE, CELLSIZE)))
-    wall_img = pygame.image.load('wall.png')
-    wall_img = pygame.transform.scale(wall_img, ((CELLSIZE, CELLSIZE)))
-
+def draw_level(bgGroup, grass_img, wall_img):
     for x, y, bg_type in bgGroup:
         if bg_type == '#':
             DISPLAYSURF.blit(wall_img, (x * CELLSIZE, y * CELLSIZE))
-        if bg_type in ('.', 'X'):
-            DISPLAYSURF.blit(grass_img, (x * CELLSIZE, y * CELLSIZE))
-        if bg_type == 'L':
+        else:
             DISPLAYSURF.blit(grass_img, (x * CELLSIZE, y * CELLSIZE))
 
 
@@ -193,7 +193,7 @@ class Player():
         if self.moving_up and self.y > 0:
             self.y -= 1
             self.anicount += 1
-        if self.moving_right and self.x < (SCREENWIDTH / CELLSIZE):
+        if self.moving_right and self.x <= (SCREENWIDTH / CELLSIZE):
             self.x += 1
             self.anicount += 1
         if self.moving_left and self.x > 0:
@@ -203,14 +203,14 @@ class Player():
             self.x = current_x
             self.y = current_y 
         if (self.x, self.y) in connGroup:
-            if self.y == 11 and self.moving_down:
+            if self.y >= ((SCREENHEIGHT / CELLSIZE) - 1) and self.moving_down:
                 mapY += 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
                 create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
                 self.y = 0
-            elif self.x == 15 and self.moving_right:
+            elif self.x >= ((SCREENWIDTH / CELLSIZE) - 1) and self.moving_right:
                 mapX += 1
                 del bgGroup[:]
                 del wallGroup[:]
