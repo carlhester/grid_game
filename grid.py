@@ -26,6 +26,8 @@ def main():
     grass_img = pygame.transform.scale(grass_img, ((CELLSIZE, CELLSIZE)))
     wall_img = pygame.image.load('wall.png')
     wall_img = pygame.transform.scale(wall_img, ((CELLSIZE, CELLSIZE)))
+    sand_img = pygame.image.load('sand.png')
+    sand_img = pygame.transform.scale(sand_img, ((CELLSIZE, CELLSIZE)))
 
     rock_spritesheet = pygame.image.load('rock_spritesheet.png')
     rock_surf = pygame.Surface((32, 32), pygame.SRCALPHA)
@@ -33,7 +35,7 @@ def main():
     rock_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
 
     bg_images = {}
-    bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock' : rock_img}
+    bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock' : rock_img, 'sand' : sand_img}
 
     player = Player(5,4) 
 
@@ -113,6 +115,8 @@ def draw_level(bgGroup, bg_images):
             DISPLAYSURF.blit(bg_images['wall'], (x * CELLSIZE, y * CELLSIZE))
         elif bg_type == '%':
             DISPLAYSURF.blit(bg_images['rock'], (x * CELLSIZE, y * CELLSIZE))
+        elif bg_type == '*' or bg_type == 'X':
+            DISPLAYSURF.blit(bg_images['sand'], (x * CELLSIZE, y * CELLSIZE))
         #else:
         #    DISPLAYSURF.blit(bg_images['grass'], (x * CELLSIZE, y * CELLSIZE))
 
