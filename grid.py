@@ -32,10 +32,14 @@ def main():
     rock_spritesheet = pygame.image.load('rock_spritesheet.png')
     rock_surf = pygame.Surface((32, 32), pygame.SRCALPHA)
     rock_surf.blit(rock_spritesheet, (-70, 0))
-    rock_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
+    rock1_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
+    rock_surf.blit(rock_spritesheet, (-35, 0))
+    rock2_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
+    rock_surf.blit(rock_spritesheet, (0, 0))
+    rock3_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
 
     bg_images = {}
-    bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock' : rock_img, 'sand' : sand_img}
+    bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock1' : rock1_img, 'rock2' : rock2_img, 'rock3' : rock3_img, 'sand' : sand_img}
 
     player = Player(5,4) 
 
@@ -81,8 +85,6 @@ class Message():
             textrect.centerx = left + (((width) / 2) - (textlength/2))
             textrect.y = top + (height / 2)
             DISPLAYSURF.blit(text, textrect)
-            print left,width
-            print textrect.x
     
     def clear(self):
         self.text = ""
@@ -98,12 +100,11 @@ def drawHearts(player):
             spacing += 30
 
 def create_level(level, bgGroup, wallGroup, player, connGroup):
+    block_items = ["#", "o", "O", "0"] 
     for y in range(0, len(level)):
         for x in range(0, len(level[y])):
             bgGroup.append((x, y, level[y][x]))
-            if level[y][x] == '#':
-                wallGroup.append((x, y))
-            if level[y][x] == '%':
+            if level[y][x] in block_items:
                 wallGroup.append((x, y))
             if level[y][x] == 'X':
                 connGroup.append((x, y))
@@ -113,8 +114,12 @@ def draw_level(bgGroup, bg_images):
         DISPLAYSURF.blit(bg_images['grass'], (x * CELLSIZE, y * CELLSIZE))
         if bg_type == '#':
             DISPLAYSURF.blit(bg_images['wall'], (x * CELLSIZE, y * CELLSIZE))
-        elif bg_type == '%':
-            DISPLAYSURF.blit(bg_images['rock'], (x * CELLSIZE, y * CELLSIZE))
+        elif bg_type == '0':
+            DISPLAYSURF.blit(bg_images['rock1'], (x * CELLSIZE, y * CELLSIZE))
+        elif bg_type == 'O':
+            DISPLAYSURF.blit(bg_images['rock2'], (x * CELLSIZE, y * CELLSIZE))
+        elif bg_type == 'o':
+            DISPLAYSURF.blit(bg_images['rock3'], (x * CELLSIZE, y * CELLSIZE))
         elif bg_type == '*' or bg_type == 'X':
             DISPLAYSURF.blit(bg_images['sand'], (x * CELLSIZE, y * CELLSIZE))
         #else:
