@@ -42,6 +42,7 @@ def main():
     bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock1' : rock1_img, 'rock2' : rock2_img, 'rock3' : rock3_img, 'sand' : sand_img}
 
     player = Player(5,4) 
+    badguy = BadGuy(5, 5, "shyguy")
 
     mapX = 0
     mapY = 0 
@@ -58,12 +59,15 @@ def main():
         getInput(player, message)
         player.update(wallGroup, connGroup, bgGroup)
         draw_level(bgGroup, bg_images)
+        badguy.update()
+        badguy.draw()
         player.draw()
         #drawGrid()    
         drawHearts(player)
         message.draw(basicfont)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+
 
 class Message():
     def __init__(self):
@@ -170,6 +174,25 @@ def getInput(player, message):
             player.moving_right = 0
         if event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
             player.moving_left = 0
+
+class BadGuy():
+    def __init__(self, x, y, badguytype):
+        self.badguy_img = pygame.image.load('badguy.png')
+        self.badguy_img = pygame.transform.scale(self.badguy_img, (CELLSIZE, CELLSIZE))
+        self.x = x
+        self.y = y
+        self.badguytype = badguytype
+
+    def update(self):
+        rand_x = random.randint(-1, 1)
+        rand_y = random.randint(-1, 1)
+        self.x += rand_x
+        self.y += rand_y
+        
+
+    def draw(self):
+        DISPLAYSURF.blit(self.badguy_img, (self.x * CELLSIZE, self.y * CELLSIZE))
+
 
 class Player():
     def __init__(self, x, y):
