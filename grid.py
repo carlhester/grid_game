@@ -19,7 +19,7 @@ def main():
     FPSCLOCK = pygame.time.Clock()
     
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
-    DISPLAYSURF.set_alpha(0)
+    #DISPLAYSURF.set_alpha(0)
 
     basicfont = pygame.font.SysFont(None, 32, 0, 1)
    
@@ -28,8 +28,18 @@ def main():
     wall_img = pygame.image.load('wall.png')
     wall_img = pygame.transform.scale(wall_img, ((CELLSIZE, CELLSIZE)))
 
+    rock_spritesheet = pygame.image.load('rock_spritesheet.png').convert()
+    rock_surf = pygame.Surface((30, 30), pygame.SRCALPHA)
+    rock_img = rock_surf.blit(rock_spritesheet, (-70, 0))
+    rock_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
+
+   #     self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA)
+   #     self.player_surf.blit(self.spritesheet, (-64, -32))
+   #     self.player_img_left = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
+   #     self.player_img_left_list.append(self.player_img_left)
+    
     bg_images = {}
-    bg_images = {'grass' : grass_img, 'wall' : wall_img}
+    bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock' : rock_img}
 
     player = Player(5,4) 
 
@@ -97,6 +107,8 @@ def create_level(level, bgGroup, wallGroup, player, connGroup):
             bgGroup.append((x, y, level[y][x]))
             if level[y][x] == '#':
                 wallGroup.append((x, y))
+            if level[y][x] == '%':
+                wallGroup.append((x, y))
             if level[y][x] == 'X':
                 connGroup.append((x, y))
 
@@ -104,6 +116,8 @@ def draw_level(bgGroup, bg_images):
     for x, y, bg_type in bgGroup:
         if bg_type == '#':
             DISPLAYSURF.blit(bg_images['wall'], (x * CELLSIZE, y * CELLSIZE))
+        elif bg_type == '%':
+            DISPLAYSURF.blit(bg_images['rock'], (x * CELLSIZE, y * CELLSIZE))
         else:
             DISPLAYSURF.blit(bg_images['grass'], (x * CELLSIZE, y * CELLSIZE))
 
