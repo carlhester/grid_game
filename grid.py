@@ -19,7 +19,6 @@ def main():
     FPSCLOCK = pygame.time.Clock()
     
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
-    #DISPLAYSURF.set_alpha(0)
 
     basicfont = pygame.font.SysFont(None, 32, 0, 1)
    
@@ -28,16 +27,11 @@ def main():
     wall_img = pygame.image.load('wall.png')
     wall_img = pygame.transform.scale(wall_img, ((CELLSIZE, CELLSIZE)))
 
-    rock_spritesheet = pygame.image.load('rock_spritesheet.png').convert()
-    rock_surf = pygame.Surface((30, 30), pygame.SRCALPHA)
-    rock_img = rock_surf.blit(rock_spritesheet, (-70, 0))
+    rock_spritesheet = pygame.image.load('rock_spritesheet.png')
+    rock_surf = pygame.Surface((32, 32), pygame.SRCALPHA)
+    rock_surf.blit(rock_spritesheet, (-70, 0))
     rock_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
 
-   #     self.player_surf = pygame.Surface((30, 30), pygame.SRCALPHA)
-   #     self.player_surf.blit(self.spritesheet, (-64, -32))
-   #     self.player_img_left = pygame.transform.scale(self.player_surf, (CELLSIZE, CELLSIZE))
-   #     self.player_img_left_list.append(self.player_img_left)
-    
     bg_images = {}
     bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock' : rock_img}
 
@@ -54,6 +48,7 @@ def main():
     GAMERUNNING = True
     while GAMERUNNING == True:
         pygame.display.set_caption(str(player.x) + ":" + str(player.y) + "\t" + str(mapX) + ":" + str(mapY)) 
+        #DISPLAYSURF.fill((0, 255, 0))
         getInput(player, message)
         player.update(wallGroup, connGroup, bgGroup)
         draw_level(bgGroup, bg_images)
@@ -63,7 +58,6 @@ def main():
         message.draw(basicfont)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
-
 
 class Message():
     def __init__(self):
@@ -114,12 +108,13 @@ def create_level(level, bgGroup, wallGroup, player, connGroup):
 
 def draw_level(bgGroup, bg_images):
     for x, y, bg_type in bgGroup:
+        DISPLAYSURF.blit(bg_images['grass'], (x * CELLSIZE, y * CELLSIZE))
         if bg_type == '#':
             DISPLAYSURF.blit(bg_images['wall'], (x * CELLSIZE, y * CELLSIZE))
         elif bg_type == '%':
             DISPLAYSURF.blit(bg_images['rock'], (x * CELLSIZE, y * CELLSIZE))
-        else:
-            DISPLAYSURF.blit(bg_images['grass'], (x * CELLSIZE, y * CELLSIZE))
+        #else:
+        #    DISPLAYSURF.blit(bg_images['grass'], (x * CELLSIZE, y * CELLSIZE))
 
 
 def drawGrid():
