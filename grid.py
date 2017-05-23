@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import levels
+from pygame.locals import *
 
 FPS = 30
 CELLSIZE = 50 
@@ -19,6 +20,8 @@ def main():
     
     DISPLAYSURF = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     DISPLAYSURF.set_alpha(0)
+
+    basicfont = pygame.font.SysFont(None, 32, 0, 1)
    
     grass_img = pygame.image.load('grass.png')
     grass_img = pygame.transform.scale(grass_img, ((CELLSIZE, CELLSIZE)))
@@ -47,7 +50,7 @@ def main():
         player.draw()
         #drawGrid()    
         drawHearts(player)
-        message.draw()
+        message.draw(basicfont)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -59,14 +62,22 @@ class Message():
     def update(self, text):
         self.text = text
         
-    def draw(self):
+    def draw(self, basicfont):
         if self.text != "":
             width = int(SCREENWIDTH * .8)
             height = int(SCREENHEIGHT / 5)
             left = int(SCREENWIDTH - width) / 2
             top = int((SCREENHEIGHT / 5))
+            textlength = len(self.text)
             pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (left, top, width, height))
-       
+            text = basicfont.render(self.text, False, (255, 255, 255), (0,0,0))
+            textrect = text.get_rect()
+            textrect.centerx = left + (((width) / 2) - (textlength/2))
+            textrect.y = top + (height / 2)
+            DISPLAYSURF.blit(text, textrect)
+            print left,width
+            print textrect.x
+    
     def clear(self):
         self.text = ""
 
@@ -80,14 +91,6 @@ def drawHearts(player):
             DISPLAYSURF.blit(heart_img, (spacing, 10))
             spacing += 30
 
-#def drawMessages(message=False):
-#    if message != "":
-#        width = int(SCREENWIDTH * .8)
-#        height = int(SCREENHEIGHT / 5)
-#        left = int(SCREENWIDTH - width) / 2
-#        top = int((SCREENHEIGHT / 5))
-#        pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (left, top, width, height))
-    
 def create_level(level, bgGroup, wallGroup, player, connGroup):
     for y in range(0, len(level)):
         for x in range(0, len(level[y])):
@@ -117,7 +120,7 @@ def getInput(player, message):
         if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
             message.clear()
         if event.type == pygame.KEYUP and event.key == pygame.K_z:
-            message.update("ok")
+            message.update("This is a dangerous place!")
         if event.type == pygame.KEYUP and event.key == pygame.K_q:
             pygame.quit()
             sys.exit()
