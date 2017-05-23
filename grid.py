@@ -35,21 +35,42 @@ def main():
     wallGroup = [] 
     bgGroup = []
     connGroup = []
+    message = Message()
     create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, player, connGroup)
     
     GAMERUNNING = True
     while GAMERUNNING == True:
         pygame.display.set_caption(str(player.x) + ":" + str(player.y) + "\t" + str(mapX) + ":" + str(mapY)) 
-        drawMessages()
-        getInput(player)
+        getInput(player, message)
         player.update(wallGroup, connGroup, bgGroup)
         draw_level(bgGroup, bg_images)
         player.draw()
         #drawGrid()    
         drawHearts(player)
+        message.draw()
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
+
+class Message():
+    def __init__(self):
+        self.text = ""
+
+    def update(self, text):
+        self.text = text
+        
+    def draw(self):
+        if self.text != "":
+            width = int(SCREENWIDTH * .8)
+            height = int(SCREENHEIGHT / 5)
+            left = int(SCREENWIDTH - width) / 2
+            top = int((SCREENHEIGHT / 5))
+            pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (left, top, width, height))
+       
+    def clear(self):
+        self.text = ""
+
+ 
 def drawHearts(player):
     heart_img = pygame.image.load('heart.png')
     heart_img = pygame.transform.scale(heart_img, (20, 20))
@@ -59,13 +80,13 @@ def drawHearts(player):
             DISPLAYSURF.blit(heart_img, (spacing, 10))
             spacing += 30
 
-def drawMessages(message=False):
-    if message != "":
-        width = int(SCREENWIDTH * .8)
-        height = int(SCREENHEIGHT / 5)
-        left = int(SCREENWIDTH - width) / 2
-        top = int((SCREENHEIGHT / 5))
-        pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (left, top, width, height))
+#def drawMessages(message=False):
+#    if message != "":
+#        width = int(SCREENWIDTH * .8)
+#        height = int(SCREENHEIGHT / 5)
+#        left = int(SCREENWIDTH - width) / 2
+#        top = int((SCREENHEIGHT / 5))
+#        pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (left, top, width, height))
     
 def create_level(level, bgGroup, wallGroup, player, connGroup):
     for y in range(0, len(level)):
@@ -90,9 +111,13 @@ def drawGrid():
     for y in range(0, SCREENHEIGHT, CELLSIZE):
         pygame.draw.line(DISPLAYSURF, (100, 100, 100), (0, y), (SCREENWIDTH, y))
 
-def getInput(player):
+def getInput(player, message):
 
     for event in pygame.event.get():
+        if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+            message.clear()
+        if event.type == pygame.KEYUP and event.key == pygame.K_z:
+            message.update("ok")
         if event.type == pygame.KEYUP and event.key == pygame.K_q:
             pygame.quit()
             sys.exit()
