@@ -22,24 +22,7 @@ def main():
 
     basicfont = pygame.font.SysFont(None, 32, 0, 1)
    
-    grass_img = pygame.image.load('grass.png')
-    grass_img = pygame.transform.scale(grass_img, ((CELLSIZE, CELLSIZE)))
-    wall_img = pygame.image.load('wall.png')
-    wall_img = pygame.transform.scale(wall_img, ((CELLSIZE, CELLSIZE)))
-    sand_img = pygame.image.load('sand.png')
-    sand_img = pygame.transform.scale(sand_img, ((CELLSIZE, CELLSIZE)))
-
-    rock_spritesheet = pygame.image.load('rock_spritesheet.png')
-    rock_surf = pygame.Surface((32, 32), pygame.SRCALPHA)
-    rock_surf.blit(rock_spritesheet, (-70, 0))
-    rock1_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
-    rock_surf.blit(rock_spritesheet, (-35, 0))
-    rock2_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
-    rock_surf.blit(rock_spritesheet, (0, 0))
-    rock3_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
-
-    bg_images = {}
-    bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock1' : rock1_img, 'rock2' : rock2_img, 'rock3' : rock3_img, 'sand' : sand_img}
+    bg_images = generate_map_images()
 
     player = Player(5,4) 
     badguy = BadGuy(5, 5, "shyguy")
@@ -58,7 +41,7 @@ def main():
         #DISPLAYSURF.fill((0, 255, 0))
         draw_level(bgGroup, bg_images)
         getInput(player, message)
-        player.update(wallGroup, connGroup, bgGroup)
+        player.update(wallGroup, connGroup, bgGroup, message)
         badguy.update(wallGroup)
         badguy.draw()
         player.draw()
@@ -67,6 +50,28 @@ def main():
         message.draw(basicfont)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+
+def generate_map_images():
+    grass_img = pygame.image.load('grass.png')
+    grass_img = pygame.transform.scale(grass_img, ((CELLSIZE, CELLSIZE)))
+    wall_img = pygame.image.load('wall.png')
+    wall_img = pygame.transform.scale(wall_img, ((CELLSIZE, CELLSIZE)))
+    sand_img = pygame.image.load('sand.png')
+    sand_img = pygame.transform.scale(sand_img, ((CELLSIZE, CELLSIZE)))
+
+    rock_spritesheet = pygame.image.load('rock_spritesheet.png')
+    rock_surf = pygame.Surface((32, 32), pygame.SRCALPHA)
+    rock_surf.blit(rock_spritesheet, (-70, 0))
+    rock1_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
+    rock_surf.blit(rock_spritesheet, (-35, 0))
+    rock2_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
+    rock_surf.blit(rock_spritesheet, (0, 0))
+    rock3_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
+
+    bg_images = {}
+    bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock1' : rock1_img, 'rock2' : rock2_img, 'rock3' : rock3_img, 'sand' : sand_img}
+    return bg_images
+
 
 
 class Message():
@@ -296,7 +301,7 @@ class Player():
         self.messages = ""
 
 
-    def update(self, wallGroup, connGroup, bgGroup):
+    def update(self, wallGroup, connGroup, bgGroup, message):
         global mapX, mapY 
         current_x = self.x
         current_y = self.y
@@ -344,6 +349,10 @@ class Player():
                 del connGroup[:]
                 create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
                 self.x = 15
+            if mapX == 0 and mapY == 1: 
+                message.update("Warning!")
+                
+                
         if self.anicount >= 3:
             self.anicount = 0
         self.moving_down = self.moving_up = self.moving_left = self.moving_right = 0     
