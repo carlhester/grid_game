@@ -56,10 +56,10 @@ def main():
     while GAMERUNNING == True:
         pygame.display.set_caption(str(player.x) + ":" + str(player.y) + "\t" + str(mapX) + ":" + str(mapY)) 
         #DISPLAYSURF.fill((0, 255, 0))
+        draw_level(bgGroup, bg_images)
         getInput(player, message)
         player.update(wallGroup, connGroup, bgGroup)
-        draw_level(bgGroup, bg_images)
-        badguy.update()
+        badguy.update(wallGroup)
         badguy.draw()
         player.draw()
         #drawGrid()    
@@ -182,13 +182,28 @@ class BadGuy():
         self.x = x
         self.y = y
         self.badguytype = badguytype
+        self.moving_direction = 0
+        self.distance_traveled = 0 
 
-    def update(self):
-        rand_x = random.randint(-1, 1)
-        rand_y = random.randint(-1, 1)
-        self.x += rand_x
-        self.y += rand_y
-        
+    def update(self, wallGroup):
+        current_x = self.x
+        current_y = self.y
+        if self.distance_traveled < 3:
+            if self.moving_direction == 0:
+                self.x += 1
+            if self.moving_direction == 1:
+                self.y += 1
+            if self.moving_direction == 2:
+                self.x -= 1
+            if self.moving_direction == 3:
+                self.y -= 1
+            self.distance_traveled += 1
+        else:
+            self.distance_traveled = 0
+            self.moving_direction = random.randint(0,4) 
+        if (self.x, self.y) in wallGroup:
+            self.x = current_x
+            self.y = current_y
 
     def draw(self):
         DISPLAYSURF.blit(self.badguy_img, (self.x * CELLSIZE, self.y * CELLSIZE))
