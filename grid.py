@@ -13,7 +13,7 @@ assert SCREENWIDTH % CELLSIZE == 0, "dimensions are off"
 assert SCREENHEIGHT % CELLSIZE == 0, "dimensions are off"
 
 def main():
-    global GAMERUNNING, FPSCLOCK, DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE, mapX, mapY
+    global GAMERUNNING, FPSCLOCK, DISPLAYSURF, SCREENWIDTH, SCREENHEIGHT, CELLSIZE, mapX, mapY, NEXTMOVE
     pygame.init()
     
     FPSCLOCK = pygame.time.Clock()
@@ -23,6 +23,7 @@ def main():
     basicfont = pygame.font.SysFont(None, 32, 0, 1)
    
     bg_images = generate_map_images()
+    NEXTMOVE = 0
 
     player = Player(5,4) 
     badguy = BadGuy(5, 5, "shyguy")
@@ -43,6 +44,7 @@ def main():
         getInput(player, message)
         player.update(wallGroup, connGroup, bgGroup, message)
         badguy.update(wallGroup)
+        NEXTMOVE = 0 
         badguy.draw()
         player.draw()
         #drawGrid()    
@@ -191,24 +193,26 @@ class BadGuy():
         self.distance_traveled = 0 
 
     def update(self, wallGroup):
-        current_x = self.x
-        current_y = self.y
-        if self.distance_traveled < 3:
-            if self.moving_direction == 0:
-                self.x += 1
-            if self.moving_direction == 1:
-                self.y += 1
-            if self.moving_direction == 2:
-                self.x -= 1
-            if self.moving_direction == 3:
-                self.y -= 1
-            self.distance_traveled += 1
-        else:
-            self.distance_traveled = 0
-            self.moving_direction = random.randint(0,4) 
-        if (self.x, self.y) in wallGroup:
-            self.x = current_x
-            self.y = current_y
+        global NEXTMOVE
+        if NEXTMOVE == 1:
+            current_x = self.x
+            current_y = self.y
+            if self.distance_traveled < 3:
+                if self.moving_direction == 0:
+                    self.x += 1
+                if self.moving_direction == 1:
+                    self.y += 1
+                if self.moving_direction == 2:
+                    self.x -= 1
+                if self.moving_direction == 3:
+                    self.y -= 1
+                self.distance_traveled += 1
+            else:
+                self.distance_traveled = 0
+                self.moving_direction = random.randint(0,4) 
+            if (self.x, self.y) in wallGroup:
+                self.x = current_x
+                self.y = current_y
 
     def draw(self):
         DISPLAYSURF.blit(self.badguy_img, (self.x * CELLSIZE, self.y * CELLSIZE))
@@ -302,7 +306,7 @@ class Player():
 
 
     def update(self, wallGroup, connGroup, bgGroup, message):
-        global mapX, mapY 
+        global mapX, mapY, NEXTMOVE
         current_x = self.x
         current_y = self.y
         if self.moving_down and self.y < (SCREENHEIGHT / CELLSIZE):
@@ -350,8 +354,10 @@ class Player():
                 create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
                 self.x = 15
             if mapX == 0 and mapY == 1: 
-                message.update("Warning!")
-                
+                message.update("Danger Ahead  (Press Space)!")
+      
+        if self.x != current_x or self.y != current_y:
+                NEXTMOVE = 1
                 
         if self.anicount >= 3:
             self.anicount = 0
