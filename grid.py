@@ -33,16 +33,16 @@ def main():
     wallGroup = [] 
     bgGroup = []
     connGroup = []
+    shotGroup = []
     message = Message()
     create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, player, connGroup)
     
     GAMERUNNING = True
-    LOOP = 1
     while GAMERUNNING == True:
         pygame.display.set_caption(str(player.x) + ":" + str(player.y) + "\t" + str(mapX) + ":" + str(mapY)) 
         #DISPLAYSURF.fill((0, 255, 0))
         draw_level(bgGroup, bg_images)
-        getInput(player, message)
+        getInput(player, message, shotGroup)
         player.update(wallGroup, connGroup, bgGroup, message)
         badguy.update(wallGroup)
         NEXTMOVE = 0 
@@ -50,28 +50,66 @@ def main():
         player.draw()
         #drawBlackBrick(100, 200)
         #drawGrid()    
+        for shot in shotGroup:
+            shot.update()
+            shot.draw()
         drawHearts(player)
         message.draw(basicfont)
         pygame.display.update()
-        LOOP += 1
-        if LOOP > 60: brickClearScreen()
         FPSCLOCK.tick(FPS)
 
 #def drawBlackBrick():
 #    pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (x, y, 30, 10))
 
 def brickClearScreen():
+    # this doesn't work on OSX :(
     global DISPLAYSURF
     width = 30
     height = 10
     DISPLAYSURF.fill((255, 255, 255))
     pygame.display.update()
-    print "cleared"
     for x in range(0, SCREENWIDTH, width):
         for y in range(0, SCREENHEIGHT, height):
-            print x, y
             pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (x, y, width, height))
             pygame.display.update()
+
+class Shot():
+    def __init__(self, player):
+        self.shot_img = pygame.image.load('shot.png')
+        self.shot_img = pygame.transform.scale(self.shot_img, (CELLSIZE, CELLSIZE))
+        self.shot_img_up = pygame.transform.rotate(self.shot_img, -90)
+        self.shot_img_down = pygame.transform.rotate(self.shot_img, 90)
+        self.shot_img_right = pygame.transform.flip(self.shot_img, 1, 0)
+        self.facing = player.facing
+        self.speed = 30
+        self.x = player.x * CELLSIZE
+        self.y = player.y * CELLSIZE
+       
+    def update(self):
+        if self.facing == 1 and self.y <= SCREENHEIGHT:
+            self.y += self.speed
+        elif self.facing == 3 and self.y > 0:
+            self.y -= self.speed
+        elif self.facing == 0 and self.x <= SCREENWIDTH:
+            self.x += self.speed
+        elif self.facing == 2 and self.x > 0:
+            self.x -= self.speed
+             
+    def draw(self): 
+        if self.facing == 1: self.shot_img = self.shot_img_down
+        if self.facing == 0: self.shot_img = self.shot_img_right
+        if self.facing == 3: self.shot_img = self.shot_img_up
+        DISPLAYSURF.blit(self.shot_img, (self.x, self.y))
+
+
+class Boss():
+    def __init__(self):
+        pass
+       
+    def update():
+        pass 
+    def draw(): 
+        pass 
 
 class Message():
     def __init__(self):
@@ -141,14 +179,15 @@ def drawGrid():
         pygame.draw.line(DISPLAYSURF, (100, 100, 100), (0, y), (SCREENWIDTH, y))
 
 
-def getInput(player, message):
+def getInput(player, message, shotGroup):
 
     for event in pygame.event.get():
         if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
             message.clear()
+            shot = Shot(player)
+            shotGroup.append(shot)
         if event.type == pygame.KEYUP and event.key == pygame.K_z:
-       #     message.update("This is a dangerous place!")
-            brickClearScreen()
+            message.update("This is a dangerous place!")
         if event.type == pygame.KEYUP and event.key == pygame.K_q:
             pygame.quit()
             sys.exit()
