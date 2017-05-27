@@ -37,6 +37,7 @@ def main():
     create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, player, connGroup)
     
     GAMERUNNING = True
+    LOOP = 1
     while GAMERUNNING == True:
         pygame.display.set_caption(str(player.x) + ":" + str(player.y) + "\t" + str(mapX) + ":" + str(mapY)) 
         #DISPLAYSURF.fill((0, 255, 0))
@@ -47,11 +48,30 @@ def main():
         NEXTMOVE = 0 
         badguy.draw()
         player.draw()
+        #drawBlackBrick(100, 200)
         #drawGrid()    
         drawHearts(player)
         message.draw(basicfont)
         pygame.display.update()
+        LOOP += 1
+        if LOOP > 60: brickClearScreen()
         FPSCLOCK.tick(FPS)
+
+#def drawBlackBrick():
+#    pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (x, y, 30, 10))
+
+def brickClearScreen():
+    global DISPLAYSURF
+    width = 30
+    height = 10
+    DISPLAYSURF.fill((255, 255, 255))
+    pygame.display.update()
+    print "cleared"
+    for x in range(0, SCREENWIDTH, width):
+        for y in range(0, SCREENHEIGHT, height):
+            print x, y
+            pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (x, y, width, height))
+            pygame.display.update()
 
 class Message():
     def __init__(self):
@@ -120,13 +140,15 @@ def drawGrid():
     for y in range(0, SCREENHEIGHT, CELLSIZE):
         pygame.draw.line(DISPLAYSURF, (100, 100, 100), (0, y), (SCREENWIDTH, y))
 
+
 def getInput(player, message):
 
     for event in pygame.event.get():
         if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
             message.clear()
         if event.type == pygame.KEYUP and event.key == pygame.K_z:
-            message.update("This is a dangerous place!")
+       #     message.update("This is a dangerous place!")
+            brickClearScreen()
         if event.type == pygame.KEYUP and event.key == pygame.K_q:
             pygame.quit()
             sys.exit()
@@ -352,6 +374,8 @@ class Player():
             DISPLAYSURF.blit(self.player_img_left_list[self.anicount], (self.x * CELLSIZE,self.y * CELLSIZE))
         if self.facing == 3:
             DISPLAYSURF.blit(self.player_img_back_list[self.anicount], (self.x * CELLSIZE,self.y * CELLSIZE))
+
+
 
 def generate_map_images():
     grass_img = pygame.image.load('grass.png')
