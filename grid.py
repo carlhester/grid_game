@@ -53,29 +53,6 @@ def main():
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-def generate_map_images():
-    grass_img = pygame.image.load('grass.png')
-    grass_img = pygame.transform.scale(grass_img, ((CELLSIZE, CELLSIZE)))
-    wall_img = pygame.image.load('wall.png')
-    wall_img = pygame.transform.scale(wall_img, ((CELLSIZE, CELLSIZE)))
-    sand_img = pygame.image.load('sand.png')
-    sand_img = pygame.transform.scale(sand_img, ((CELLSIZE, CELLSIZE)))
-
-    rock_spritesheet = pygame.image.load('rock_spritesheet.png')
-    rock_surf = pygame.Surface((32, 32), pygame.SRCALPHA)
-    rock_surf.blit(rock_spritesheet, (-70, 0))
-    rock1_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
-    rock_surf.blit(rock_spritesheet, (-35, 0))
-    rock2_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
-    rock_surf.blit(rock_spritesheet, (0, 0))
-    rock3_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
-
-    bg_images = {}
-    bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock1' : rock1_img, 'rock2' : rock2_img, 'rock3' : rock3_img, 'sand' : sand_img}
-    return bg_images
-
-
-
 class Message():
     def __init__(self):
         self.text = ""
@@ -325,34 +302,36 @@ class Player():
             self.x = current_x
             self.y = current_y 
         if (self.x, self.y) in connGroup:
+            DISPLAYSURF.fill((0, 64, 0))
+            
             if self.y >= ((SCREENHEIGHT / CELLSIZE) - 1) and self.moving_down:
                 mapY += 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
                 create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
-                self.y = 0
+                self.y = 1
             elif self.x >= ((SCREENWIDTH / CELLSIZE) - 1) and self.moving_right:
                 mapX += 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
                 create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
-                self.x = 0
+                self.x = 1
             elif self.y == 0 and self.moving_up:
                 mapY -= 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
                 create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
-                self.y = 11
+                self.y = 10
             elif self.x == 0 and self.moving_left:
                 mapX -= 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
                 create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup)
-                self.x = 15
+                self.x = 14
             if mapX == 0 and mapY == 1: 
                 message.update("Danger Ahead  (Press Space)!")
       
@@ -374,6 +353,26 @@ class Player():
         if self.facing == 3:
             DISPLAYSURF.blit(self.player_img_back_list[self.anicount], (self.x * CELLSIZE,self.y * CELLSIZE))
 
+def generate_map_images():
+    grass_img = pygame.image.load('grass.png')
+    grass_img = pygame.transform.scale(grass_img, ((CELLSIZE, CELLSIZE)))
+    wall_img = pygame.image.load('wall.png')
+    wall_img = pygame.transform.scale(wall_img, ((CELLSIZE, CELLSIZE)))
+    sand_img = pygame.image.load('sand.png')
+    sand_img = pygame.transform.scale(sand_img, ((CELLSIZE, CELLSIZE)))
+
+    rock_spritesheet = pygame.image.load('rock_spritesheet.png')
+    rock_surf = pygame.Surface((32, 32), pygame.SRCALPHA)
+    rock_surf.blit(rock_spritesheet, (-70, 0))
+    rock1_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
+    rock_surf.blit(rock_spritesheet, (-35, 0))
+    rock2_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
+    rock_surf.blit(rock_spritesheet, (0, 0))
+    rock3_img = pygame.transform.scale(rock_surf, (CELLSIZE, CELLSIZE))
+
+    bg_images = {}
+    bg_images = {'grass' : grass_img, 'wall' : wall_img, 'rock1' : rock1_img, 'rock2' : rock2_img, 'rock3' : rock3_img, 'sand' : sand_img}
+    return bg_images
  
 
 if __name__ == '__main__':
