@@ -40,7 +40,6 @@ def main():
     GAMERUNNING = True
     while GAMERUNNING == True:
         pygame.display.set_caption(str(player.x) + ":" + str(player.y) + "\t" + str(mapX) + ":" + str(mapY)) 
-        #DISPLAYSURF.fill((0, 255, 0))
         draw_level(bgGroup, bg_images)
         getInput(player, message, shotGroup)
         player.update(wallGroup, connGroup, bgGroup, message)
@@ -48,18 +47,15 @@ def main():
         NEXTMOVE = 0 
         badguy.draw()
         player.draw()
-        #drawBlackBrick(100, 200)
         #drawGrid()    
         for shot in shotGroup:
-            shot.update()
+            shot.update(shotGroup)
             shot.draw()
         drawHearts(player)
         message.draw(basicfont)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-#def drawBlackBrick():
-#    pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (x, y, 30, 10))
 
 def brickClearScreen():
     # this doesn't work on OSX :(
@@ -85,15 +81,20 @@ class Shot():
         self.x = player.x * CELLSIZE
         self.y = player.y * CELLSIZE
        
-    def update(self):
+    def update(self, shotGroup):
+        if self.y > SCREENHEIGHT or self.y < 0 or self.x > SCREENWIDTH or self.x < 0:
+            shotGroup.remove(self)
+            
         if self.facing == 1 and self.y <= SCREENHEIGHT:
             self.y += self.speed
-        elif self.facing == 3 and self.y > 0:
+        elif self.facing == 3 and self.y >= -5:
             self.y -= self.speed
         elif self.facing == 0 and self.x <= SCREENWIDTH:
             self.x += self.speed
-        elif self.facing == 2 and self.x > 0:
+        elif self.facing == 2 and self.x > -5:
             self.x -= self.speed
+        
+    
              
     def draw(self): 
         if self.facing == 1: self.shot_img = self.shot_img_down
