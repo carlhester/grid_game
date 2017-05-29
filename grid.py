@@ -185,8 +185,9 @@ def getInput(player, message, shotGroup):
     for event in pygame.event.get():
         if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
             message.clear()
-            shot = Shot(player)
-            shotGroup.append(shot)
+            if len(shotGroup) < 3:
+                shot = Shot(player)
+                shotGroup.append(shot)
         if event.type == pygame.KEYUP and event.key == pygame.K_z:
             message.update("This is a dangerous place!")
         if event.type == pygame.KEYUP and event.key == pygame.K_q:
