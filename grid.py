@@ -36,15 +36,16 @@ def main():
     shotGroup = []
     coinGroup = []
     keyGroup = []
+    doorGroup = []
     message = Message()
-    create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, player, connGroup, coinGroup, keyGroup)
+    create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, player, connGroup, coinGroup, keyGroup, doorGroup)
     
     GAMERUNNING = True
     while GAMERUNNING == True:
         pygame.display.set_caption(str(player.x) + ":" + str(player.y) + "\t" + str(mapX) + ":" + str(mapY)) 
-        draw_level(bgGroup, bg_images, coinGroup, keyGroup)
+        draw_level(bgGroup, bg_images, coinGroup, keyGroup, doorGroup)
         getInput(player, message, shotGroup)
-        player.update(wallGroup, connGroup, bgGroup, message, coinGroup, keyGroup)
+        player.update(wallGroup, connGroup, bgGroup, message, coinGroup, keyGroup, doorGroup)
         badguy.update(wallGroup)
         NEXTMOVE = 0 
         badguy.draw()
@@ -148,8 +149,8 @@ def drawHearts(player):
             DISPLAYSURF.blit(heart_img, (spacing, 10))
             spacing += 30
 
-def create_level(level, bgGroup, wallGroup, player, connGroup, coinGroup, keyGroup):
-    block_items = ["#", "o", "O", "0", "D"] 
+def create_level(level, bgGroup, wallGroup, player, connGroup, coinGroup, keyGroup, doorGroup):
+    block_items = ["#", "o", "O", "0"] 
     for y in range(0, len(level)):
         for x in range(0, len(level[y])):
             bgGroup.append((x, y, level[y][x]))
@@ -161,13 +162,15 @@ def create_level(level, bgGroup, wallGroup, player, connGroup, coinGroup, keyGro
                 coinGroup.append((x, y))
             if level[y][x] == 'k':
                 keyGroup.append((x, y))
+            if level[y][x] == 'D':
+                doorGroup.append((x, y))
 
-def draw_level(bgGroup, bg_images, coinGroup, keyGroup):
+def draw_level(bgGroup, bg_images, coinGroup, keyGroup, doorGroup):
     for x, y, bg_type in bgGroup:
         DISPLAYSURF.blit(bg_images['grass'], (x * CELLSIZE, y * CELLSIZE))
         if bg_type == '#':
             DISPLAYSURF.blit(bg_images['wall'], (x * CELLSIZE, y * CELLSIZE))
-        elif bg_type == 'D':
+        elif bg_type == 'D' and (x,y) in doorGroup:
             DISPLAYSURF.blit(bg_images['door'], (x * CELLSIZE, y * CELLSIZE))
         elif bg_type == 'C' and (x,y) in coinGroup:
             DISPLAYSURF.blit(bg_images['coin'], (x * CELLSIZE, y * CELLSIZE))
@@ -355,9 +358,10 @@ class Player():
         self.facing = 0 
         self.anicount = 0
         self.messages = ""
+        self.has_key = 0
 
 
-    def update(self, wallGroup, connGroup, bgGroup, message, coinGroup, keyGroup):
+    def update(self, wallGroup, connGroup, bgGroup, message, coinGroup, keyGroup, doorGroup):
         global mapX, mapY, NEXTMOVE
         current_x = self.x
         current_y = self.y
@@ -384,36 +388,45 @@ class Player():
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
-                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup, coinGroup, keyGroup)
+                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup, coinGroup, keyGroup, doorGroup)
                 self.y = 1
             elif self.x >= ((SCREENWIDTH / CELLSIZE) - 1) and self.moving_right:
                 mapX += 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
-                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup, coinGroup, keyGroup)
+                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup, coinGroup, keyGroup, doorGroup)
                 self.x = 1
             elif self.y == 0 and self.moving_up:
                 mapY -= 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
-                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup, coinGroup, keyGroup)
+                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup, coinGroup, keyGroup, doorGroup)
                 self.y = 10
             elif self.x == 0 and self.moving_left:
                 mapX -= 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
-                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup, coinGroup, keyGroup)
+                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup, self, connGroup, coinGroup, keyGroup, doorGroup)
                 self.x = 14
             if mapX == 0 and mapY == 1: 
                 message.update("Danger Ahead  (Press Space)!")
         if (self.x, self.y) in keyGroup:
             keyGroup.remove((self.x, self.y))
+            self.has_key = 1
         
         if (self.x, self.y) in coinGroup:
             coinGroup.remove((self.x, self.y))
+        
+        if (self.x, self.y) in doorGroup and self.has_key == 1:
+            doorGroup.remove((self.x, self.y))
+            self.has_key = 0 
+        elif (self.x, self.y) in doorGroup:
+            self.x = current_x
+            self.y = current_y
+        print doorGroup, self.has_key     
         
         if self.x != current_x or self.y != current_y:
                 NEXTMOVE = 1
@@ -432,6 +445,7 @@ class Player():
             DISPLAYSURF.blit(self.player_img_left_list[self.anicount], (self.x * CELLSIZE,self.y * CELLSIZE))
         if self.facing == 3:
             DISPLAYSURF.blit(self.player_img_back_list[self.anicount], (self.x * CELLSIZE,self.y * CELLSIZE))
+            
 
 
 
