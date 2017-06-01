@@ -426,7 +426,6 @@ class Player():
         elif (self.x, self.y) in doorGroup:
             self.x = current_x
             self.y = current_y
-        print doorGroup, self.has_key     
         
         if self.x != current_x or self.y != current_y:
                 NEXTMOVE = 1
