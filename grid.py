@@ -97,8 +97,6 @@ class Shot():
         elif self.facing == 2 and self.x > -5:
             self.x -= self.speed
         
-    
-             
     def draw(self): 
         if self.facing == 1: self.shot_img = self.shot_img_down
         if self.facing == 0: self.shot_img = self.shot_img_right
@@ -109,7 +107,6 @@ class Shot():
 class Boss():
     def __init__(self):
         pass
-       
     def update():
         pass 
     def draw(): 
