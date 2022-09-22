@@ -123,7 +123,7 @@ class Player():
             self.x = current_x
             self.y = current_y
         if (self.x, self.y) in connGroup:
-            DISPLAYSURF.fill((0, 64, 0))
+            g.DISPLAYSURF.fill((0, 64, 0))
 
             if self.y >= ((g.SCREENHEIGHT / g.CELLSIZE) - 1) and self.moving_down:
                 mapY += 1
