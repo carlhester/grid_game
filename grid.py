@@ -25,8 +25,6 @@ def main():
     player = Player(5, 4)
     badguy = BadGuy(5, 5, "shyguy")
 
-    mapX = 0
-    mapY = 0
     wallGroup = []
     bgGroup = []
     connGroup = []
@@ -35,13 +33,13 @@ def main():
     keyGroup = []
     doorGroup = []
     message = Message()
-    create_level(levels[mapX][mapY], bgGroup, wallGroup,
+    create_level(levels[g.mapX][g.mapY], bgGroup, wallGroup,
                  player, connGroup, coinGroup, keyGroup, doorGroup)
 
     GAMERUNNING = True
     while GAMERUNNING == True:
         pygame.display.set_caption(
-            str(player.x) + ":" + str(player.y) + "\t" + str(mapX) + ":" + str(mapY))
+            str(player.x) + ":" + str(player.y) + "\t" + str(g.mapX) + ":" + str(g.mapY))
         draw_level(bgGroup, bg_images, coinGroup, keyGroup, doorGroup)
         getInput(player, message, shotGroup)
         player.update(wallGroup, connGroup, bgGroup, message,
@@ -50,11 +48,12 @@ def main():
         g.NEXTMOVE = 0
         badguy.draw()
         player.draw()
-        drawGrid()
+        # drawGrid()
         for shot in shotGroup:
             shot.update(shotGroup)
             shot.draw()
         drawHearts(player)
+        drawCoins(player)
         message.draw(basicfont)
         pygame.display.update()
         FPSCLOCK.tick(g.FPS)
@@ -62,14 +61,13 @@ def main():
 
 def brickClearScreen():
     # this doesn't work on OSX :(
-    global DISPLAYSURF
     width = 30
     height = 10
-    DISPLAYSURF.fill((255, 255, 255))
+    g.DISPLAYSURF.fill((255, 255, 255))
     pygame.display.update()
     for x in range(0, g.SCREENWIDTH, width):
         for y in range(0, g.SCREENHEIGHT, height):
-            pygame.draw.rect(DISPLAYSURF, (0, 0, 0), (x, y, width, height))
+            pygame.draw.rect(g.DISPLAYSURF, (0, 0, 0), (x, y, width, height))
             pygame.display.update()
 
 
@@ -106,7 +104,7 @@ class Shot():
             self.shot_img = self.shot_img_right
         if self.facing == 3:
             self.shot_img = self.shot_img_up
-        DISPLAYSURF.blit(self.shot_img, (self.x, self.y))
+        g.DISPLAYSURF.blit(self.shot_img, (self.x, self.y))
 
 
 class Boss():
@@ -134,14 +132,14 @@ class Message():
             left = int(g.SCREENWIDTH - width) / 2
             top = int((g.SCREENHEIGHT / 5))
             textlength = len(self.text)
-            pygame.draw.rect(DISPLAYSURF, (0, 0, 0),
+            pygame.draw.rect(g.DISPLAYSURF, (0, 0, 0),
                              (left, top, width, height))
             text = basicfont.render(
                 self.text, False, (255, 255, 255), (0, 0, 0))
             textrect = text.get_rect()
             textrect.centerx = left + (((width) / 2) - (textlength/2))
             textrect.y = top + (height / 2)
-            DISPLAYSURF.blit(text, textrect)
+            g.DISPLAYSURF.blit(text, textrect)
 
     def clear(self):
         self.text = ""
@@ -155,6 +153,16 @@ def drawHearts(player):
         for heart in range(1, player.hitpoints + 1):
             g.DISPLAYSURF.blit(heart_img, (spacing, 10))
             spacing += 30
+
+
+def drawCoins(player):
+    coin_img = pygame.image.load('images/coin.png')
+    coin_img = pygame.transform.scale(coin_img, (20, 20))
+    spacing = 10
+    if player.hitpoints > 0:
+        for coin in range(1, player.coins + 1):
+            g.DISPLAYSURF.blit(coin_img, (spacing+200, 10))
+            spacing += 10
 
 
 def drawGrid():

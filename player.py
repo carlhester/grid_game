@@ -93,7 +93,8 @@ class Player():
 
         self.x = x
         self.y = y
-        self.hitpoints = 1
+        self.hitpoints = 5
+        self.coins = 1
         self.moving_down = 0
         self.moving_up = 0
         self.moving_left = 0
@@ -104,7 +105,6 @@ class Player():
         self.has_key = 0
 
     def update(self, wallGroup, connGroup, bgGroup, message, coinGroup, keyGroup, doorGroup):
-        global mapX, mapY
         current_x = self.x
         current_y = self.y
         if self.moving_down and self.y < (g.SCREENHEIGHT / g.CELLSIZE):
@@ -126,38 +126,38 @@ class Player():
             g.DISPLAYSURF.fill((0, 64, 0))
 
             if self.y >= ((g.SCREENHEIGHT / g.CELLSIZE) - 1) and self.moving_down:
-                mapY += 1
+                g.mapY += 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
-                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup,
+                create_level(levels[g.mapX][g.mapY], bgGroup, wallGroup,
                              self, connGroup, coinGroup, keyGroup, doorGroup)
                 self.y = 1
             elif self.x >= ((g.SCREENWIDTH / g.CELLSIZE) - 1) and self.moving_right:
-                mapX += 1
+                g.mapX += 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
-                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup,
+                create_level(levels[g.mapX][g.mapY], bgGroup, wallGroup,
                              self, connGroup, coinGroup, keyGroup, doorGroup)
                 self.x = 1
             elif self.y == 0 and self.moving_up:
-                mapY -= 1
+                g.mapY -= 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
-                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup,
+                create_level(levels[g.mapX][g.mapY], bgGroup, wallGroup,
                              self, connGroup, coinGroup, keyGroup, doorGroup)
                 self.y = 10
             elif self.x == 0 and self.moving_left:
-                mapX -= 1
+                g.mapX -= 1
                 del bgGroup[:]
                 del wallGroup[:]
                 del connGroup[:]
-                create_level(levels.levels[mapX][mapY], bgGroup, wallGroup,
+                create_level(levels[g.mapX][g.mapY], bgGroup, wallGroup,
                              self, connGroup, coinGroup, keyGroup, doorGroup)
                 self.x = 14
-            if mapX == 0 and mapY == 1:
+            if g.mapX == 0 and g.mapY == 1:
                 message.update("Danger Ahead  (Press Space)!")
         if (self.x, self.y) in keyGroup:
             keyGroup.remove((self.x, self.y))
@@ -165,6 +165,7 @@ class Player():
 
         if (self.x, self.y) in coinGroup:
             coinGroup.remove((self.x, self.y))
+            self.coins += 1
 
         if (self.x, self.y) in doorGroup and self.has_key == 1:
             doorGroup.remove((self.x, self.y))
@@ -183,13 +184,13 @@ class Player():
     def draw(self):
         if self.facing == 0:
             g.DISPLAYSURF.blit(
-                self.player_img_right_list[self.anicount], (self.x * g.CELLSIZE / 2, self.y * g.CELLSIZE / 2))
+                self.player_img_right_list[self.anicount], (self.x * g.CELLSIZE, self.y * g.CELLSIZE))
         if self.facing == 1:
             g.DISPLAYSURF.blit(
-                self.player_img_list[self.anicount], (self.x * g.CELLSIZE / 2, self.y * g.CELLSIZE / 2))
+                self.player_img_list[self.anicount], (self.x * g.CELLSIZE, self.y * g.CELLSIZE))
         if self.facing == 2:
             g.DISPLAYSURF.blit(
-                self.player_img_left_list[self.anicount], (self.x * g.CELLSIZE / 2, self.y * g.CELLSIZE / 2))
+                self.player_img_left_list[self.anicount], (self.x * g.CELLSIZE, self.y * g.CELLSIZE))
         if self.facing == 3:
             g.DISPLAYSURF.blit(
-                self.player_img_back_list[self.anicount], (self.x * g.CELLSIZE / 2, self.y * g.CELLSIZE / 2))
+                self.player_img_back_list[self.anicount], (self.x * g.CELLSIZE, self.y * g.CELLSIZE))
