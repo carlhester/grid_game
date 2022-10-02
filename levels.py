@@ -1,54 +1,58 @@
 from levels import *
 import globals as g
+from tile import *
 
 
-def draw_level(bgGroup, bg_images, coinGroup, keyGroup, doorGroup):
-    for x, y, bg_type in bgGroup:
-        g.DISPLAYSURF.blit(bg_images['grass'],
-                           (x * g.CELLSIZE, y * g.CELLSIZE))
-        if bg_type == '#':
-            g.DISPLAYSURF.blit(bg_images['wall'],
-                               (x * g.CELLSIZE, y * g.CELLSIZE))
-        elif bg_type == 'D' and (x, y) in doorGroup:
-            g.DISPLAYSURF.blit(bg_images['door'],
-                               (x * g.CELLSIZE, y * g.CELLSIZE))
-        elif bg_type == 'C' and (x, y) in coinGroup:
-            g.DISPLAYSURF.blit(bg_images['coin'],
-                               (x * g.CELLSIZE, y * g.CELLSIZE))
-        elif bg_type == 'k' and (x, y) in keyGroup:
-            g.DISPLAYSURF.blit(
-                bg_images['key'], (x * g.CELLSIZE, y * g.CELLSIZE))
-        elif bg_type == '0':
-            g.DISPLAYSURF.blit(bg_images['rock1'],
-                               (x * g.CELLSIZE, y * g.CELLSIZE))
-        elif bg_type == 'O':
-            g.DISPLAYSURF.blit(bg_images['rock2'],
-                               (x * g.CELLSIZE, y * g.CELLSIZE))
-        elif bg_type == 'o':
-            g.DISPLAYSURF.blit(bg_images['rock3'],
-                               (x * g.CELLSIZE, y * g.CELLSIZE))
-        elif bg_type == '*' or bg_type == 'X':
-            g.DISPLAYSURF.blit(bg_images['sand'],
-                               (x * g.CELLSIZE, y * g.CELLSIZE))
-        # else:
-        #    g.DISPLAYSURF.blit(bg_images['grass'], (x * g.CELLSIZE, y * g.CELLSIZE))
+class Level():
+    def __init__(self, level):
+        pass
+
+    def draw(self):
+        pass
 
 
-def create_level(level, bgGroup, wallGroup, player, connGroup, coinGroup, keyGroup, doorGroup):
-    block_items = ["#", "o", "O", "0"]
-    for y in range(0, len(level)):
-        for x in range(0, len(level[y])):
-            bgGroup.append((x, y, level[y][x]))
-            if level[y][x] in block_items:
-                wallGroup.append((x, y))
-            if level[y][x] == 'X':
-                connGroup.append((x, y))
-            if level[y][x] == 'C':
-                coinGroup.append((x, y))
-            if level[y][x] == 'k':
-                keyGroup.append((x, y))
-            if level[y][x] == 'D':
-                doorGroup.append((x, y))
+def draw_level(drawGroup):
+    for tile in drawGroup:
+        tile.draw(g.DISPLAYSURF)
+        # if bg_type == '#':
+        # g.DISPLAYSURF.blit(bg_images['wall'],
+        #                        (x * g.CELLSIZE, y * g.CELLSIZE))
+        # elif bg_type == 'D' and (x, y) in doorGroup:
+        #     g.DISPLAYSURF.blit(bg_images['door'],
+        #                        (x * g.CELLSIZE, y * g.CELLSIZE))
+        # elif bg_type == 'C' and (x, y) in coinGroup:
+        #     g.DISPLAYSURF.blit(bg_images['coin'],
+        #                        (x * g.CELLSIZE, y * g.CELLSIZE))
+        # elif bg_type == 'k' and (x, y) in keyGroup:
+        #     g.DISPLAYSURF.blit(
+        #         bg_images['key'], (x * g.CELLSIZE, y * g.CELLSIZE))
+        # elif bg_type == '0':
+        #     g.DISPLAYSURF.blit(bg_images['rock1'],
+        #                        (x * g.CELLSIZE, y * g.CELLSIZE))
+        # elif bg_type == 'O':
+        #     g.DISPLAYSURF.blit(bg_images['rock2'],
+        #                        (x * g.CELLSIZE, y * g.CELLSIZE))
+        # elif bg_type == 'o':
+        #     g.DISPLAYSURF.blit(bg_images['rock3'],
+        #                        (x * g.CELLSIZE, y * g.CELLSIZE))
+        # elif bg_type == '*' or bg_type == 'X':
+        #     g.DISPLAYSURF.blit(bg_images['sand'],
+        #                        (x * g.CELLSIZE, y * g.CELLSIZE))
+
+
+# def create_room(level, bgGroup, wallGroup, player, connGroup, coinGroup, keyGroup, doorGroup):
+#     block_items = ["#", "o", "O", "0"]
+#     for y in range(0, len(level)):
+#         for x in range(0, len(level[y])):
+#             wallGroup.append(Tile(x, y, level[y][x]))
+#         # if level[y][x] == 'X':
+#         #     connGroup.append((x, y))
+#         # if level[y][x] == 'C':
+#         #     coinGroup.append((x, y))
+#         # if level[y][x] == 'k':
+#         #     keyGroup.append((x, y))
+#         # if level[y][x] == 'D':
+#         #     doorGroup.append((x, y))
 
 
 w, h = 3, 3
